@@ -142,12 +142,12 @@ DATABASES = {
         'PORT':'5432'
     }
 }
-import  dj_database_url
-import os
-# Use dj_database_url for dynamic database configuration (e.g., in production)
-DATABASES['default'] = dj_database_url.config(
-    default=os.getenv('DATABASE_URL', 'postgres://postgres:9361744253@localhost:5432/Django_rest')
-)
+# import  dj_database_url
+# import os
+# # Use dj_database_url for dynamic database configuration (e.g., in production)
+# DATABASES['default'] = dj_database_url.config(
+#     default=os.getenv('DATABASE_URL', 'postgres://postgres:9361744253@localhost:5432/Django_rest')
+# )
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
