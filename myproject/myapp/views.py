@@ -2,6 +2,7 @@
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -17,8 +18,8 @@ class RegisterUserView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Login View
@@ -33,15 +34,15 @@ class LoginView(APIView):
             user = User.objects.get(username=username)
             if user.check_password(password):
                 refresh = RefreshToken.for_user(user)
-                return Response({
+                return JsonResponse({
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
                     "role": user.role
                 }, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                return JsonResponse({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 #faculty CreateSubjectView
 class CreateSubjectView(APIView):
     permission_classes = [IsAuthenticated]
@@ -49,7 +50,7 @@ class CreateSubjectView(APIView):
     def post(self, request):
         # Ensure that only faculty users can create a subject
         if request.user.role != 'faculty':
-            return Response({"error": "Only faculty can create subjects."}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({"error": "Only faculty can create subjects."}, status=status.HTTP_403_FORBIDDEN)
 
         # Get the user who is creating the subject (faculty)
         user = request.user
@@ -62,9 +63,9 @@ class CreateSubjectView(APIView):
 
         if serializer.is_valid():
             serializer.save()  # Save the subject to the database
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # FacultyDashboard: Create Student
 class CreateStudentView(APIView):
@@ -72,13 +73,13 @@ class CreateStudentView(APIView):
 
     def post(self, request):
         if request.user.role != 'faculty':
-            return Response({"error": "Only faculty can create students."}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({"error": "Only faculty can create students."}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = StudentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 #user listview
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -93,7 +94,7 @@ class FacultyUserListView(APIView):
     def get(self, request):
         # Ensure only faculty users can access this endpoint
         if request.user.role != 'faculty':
-            return Response(
+            return JsonResponse(
                 {"error": "Only faculty can view all students."},
                 status=status.HTTP_403_FORBIDDEN
             )
@@ -105,7 +106,7 @@ class FacultyUserListView(APIView):
         serializer = UserSerializer(students, many=True)
 
         # Return serialized student data
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
   
 #facultyview all
@@ -115,14 +116,14 @@ class FacultyStudentListView(APIView):
     def get(self, request):
         # Ensure only faculty can access this endpoint
         if request.user.role != 'faculty':
-            return Response({"error": "Only faculty can view all students."}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({"error": "Only faculty can view all students."}, status=status.HTTP_403_FORBIDDEN)
 
         # Retrieve all student records
         students = Studenttab.objects.all()
         serializer = StudentSerializer(students, many=True)
 
         # Return serialized student data
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     
 #facultyupdatestudentprofile
 class FacultyUpdateStudentProfileView(APIView):
@@ -131,23 +132,23 @@ class FacultyUpdateStudentProfileView(APIView):
     def patch(self, request, student_id):
         # Ensure that only faculty can update student details
         if request.user.role != 'faculty':
-            return Response({"error": "Only faculty can update student details."}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({"error": "Only faculty can update student details."}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch the student by their ID
             student = Studenttab.objects.get(id=student_id)
         except Studenttab.DoesNotExist:
-            return Response({"error": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({"error": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
 
         # Update student details
         serializer = StudentSerializer(student, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(
+            return JsonResponse(
                 {"message": "Student details updated successfully.", "data": serializer.data},
                 status=status.HTTP_200_OK,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
  # StudentDashboard:  StudentProfileView
 class StudentProfileView(APIView):
@@ -158,7 +159,7 @@ class StudentProfileView(APIView):
 
         # Ensure only students can access their profile
         if user.role != 'student':
-            return Response({"error": "Access Denied. Only students can access their profile."}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({"error": "Access Denied. Only students can access their profile."}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch the student profile associated with the logged-in user
@@ -173,10 +174,10 @@ class StudentProfileView(APIView):
             subjects = student_profile.subjects.all()
             student_data['subjects'] = [{"id": subject.id, "name": subject.name} for subject in subjects]
 
-            return Response(student_data, status=status.HTTP_200_OK)
+            return JsonResponse(student_data, status=status.HTTP_200_OK)
 
         except Studenttab.DoesNotExist:
-            return Response({"error": "Your student profile does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({"error": "Your student profile does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
 #UpdateStudentProfileView
 class UpdateStudentProfileView(APIView):
@@ -187,7 +188,7 @@ class UpdateStudentProfileView(APIView):
 
         # Ensure only students can update their profile
         if user.role != 'student':
-            return Response({"error": "Access Denied. Only students can update their profile."}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({"error": "Access Denied. Only students can update their profile."}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch the student profile associated with the logged-in user
@@ -207,17 +208,17 @@ class UpdateStudentProfileView(APIView):
                     # Update the student's subjects
                     profile.subjects.set(subjects)  # Using set() to overwrite the current subjects
                 except SubjectTab.DoesNotExist:
-                    return Response({"error": "One or more subjects not found."}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({"error": "One or more subjects not found."}, status=status.HTTP_400_BAD_REQUEST)
 
             # Validate and save the profile
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Studenttab.DoesNotExist:
-            return Response({"error": "Your student profile does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({"error": "Your student profile does not exist."}, status=status.HTTP_404_NOT_FOUND)
 # Fetch all subjects from the database
 
 class SubjectListView(APIView):
@@ -231,7 +232,7 @@ class SubjectListView(APIView):
 
         # Ensure only students and faculty can access subjects
         if user.role not in ['student', 'faculty']:
-            return Response(
+            return JsonResponse(
                 {"error": "Access Denied. Only students and faculty can access subjects."},
                 status=status.HTTP_403_FORBIDDEN
             )
@@ -242,10 +243,10 @@ class SubjectListView(APIView):
 
             # Serialize the subjects
             serializer = SubjectSerializer(subjects, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             # Return a detailed error message
-            return Response(
+            return JsonResponse(
                 {"error": f"Failed to retrieve subjects: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
