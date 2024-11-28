@@ -145,7 +145,7 @@ DATABASES = {
 import  dj_database_url
 import os
 # Use dj_database_url for dynamic database configuration (e.g., in production)
-DATABASES['default'] = dj_database_url.parse("postgresql://django_rest_kq9s_user:g3HST1ddgrFz6uwGFTzqgoQYn9RvT4Wa@dpg-ct43518gph6c73c427bg-a.oregon-postgres.render.com/django_rest_kq9s")
+DATABASES['default'] = dj_database_url.parse("postgresql://django_rest_kq9s_user:g3HST1ddgrFz6uwGFTzqgoQYn9RvT4Wa@dpg-ct43518gph6c73c427bg-a/django_rest_kq9s")
 
    
 # Password validation
