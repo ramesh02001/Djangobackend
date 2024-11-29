@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-*ie5rf%bmykm%!dmj6^^ow&^of-dohsr0cmmx=dixf!x#2!#3h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1,"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -145,9 +145,9 @@ DATABASES = {
 import  dj_database_url
 import os
 # Use dj_database_url for dynamic database configuration (e.g., in production)
-DATABASES['default'] = dj_database_url.parse("postgresql://django_rest_kq9s_user:g3HST1ddgrFz6uwGFTzqgoQYn9RvT4Wa@dpg-ct43518gph6c73c427bg-a/django_rest_kq9s")
-
-   
+DATABASES['default'] = dj_database_url.config(
+    default=os.getenv('DATABASE_URL', 'postgres://postgres:9361744253@localhost:5432/Django_rest')
+)
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -189,9 +189,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # settings.py
-# AUTH_USER_MODEL = 'myapp.User'
-
-# AUTH_USER_MODEL = 'myapp.User'
+AUTH_USER_MODEL = 'myapp.User'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Allows requests from all domains (for development)
 
